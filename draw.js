@@ -80,7 +80,7 @@ function() {
     resizeWindow();
 });
 
-var keys = new Array();
+var keys = [];
 keys.down = false;
 keys.up = false;
 keys.left = false;
