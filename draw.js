@@ -47,7 +47,7 @@ function getWindowSize() {
 	myWidth = document.body.clientWidth;
 	myHeight = document.body.clientHeight;
     }
-    return {width: myWidth - 30, height: myHeight - 30};
+    return {width: myWidth - 5, height: myHeight - 5};
 }
 
 function resizeWindow() {
