@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   id="svg1901"
+   sodipodi:version="0.32"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="Uusi asiakirja 4"
+   version="1.1">
+  <defs
+     id="defs1903">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4309">
+      <stop
+         style="stop-color:#8ba3ca;stop-opacity:1"
+         offset="0"
+         id="stop4311" />
+      <stop
+         id="stop4317"
+         offset="0.67663038"
+         style="stop-color:#7676b8;stop-opacity:1" />
+      <stop
+         style="stop-color:#363669;stop-opacity:1"
+         offset="1"
+         id="stop4313" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4309"
+       id="radialGradient4315"
+       cx="31.913307"
+       cy="29.71501"
+       fx="31.913307"
+       fy="29.71501"
+       r="31.736263"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0109891,0,1.0881044e-5,1,-0.35006935,-8.3810932e-8)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.375"
+     inkscape:cx="31.912088"
+     inkscape:cy="32"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1280"
+     inkscape:window-height="949"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     showgrid="false"
+     inkscape:snap-bbox="true"
+     inkscape:snap-page="true"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata1906">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Taso 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-988.36217)">
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:url(#radialGradient4315);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path4307"
+       sodipodi:cx="32.175823"
+       sodipodi:cy="29.802198"
+       sodipodi:rx="31.736263"
+       sodipodi:ry="31.736263"
+       d="m 63.912086,29.802198 a 31.736263,31.736263 0 1 1 -63.47252606,0 31.736263,31.736263 0 1 1 63.47252606,0 z"
+       transform="matrix(1.0083103,0,0,1.0083102,-0.44321279,990.31231)" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#b7e4f0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path4319"
+       sodipodi:cx="32.87912"
+       sodipodi:cy="33.582417"
+       sodipodi:rx="10.901099"
+       sodipodi:ry="10.901099"
+       d="m 43.780219,33.582417 a 10.901099,10.901099 0 1 1 -21.802198,0 10.901099,10.901099 0 1 1 21.802198,0 z"
+       transform="translate(-0.87911987,986.77975)" />
+    <rect
+       style="color:#000000;fill:#1e444d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4321"
+       width="1.6703297"
+       height="25.758242"
+       x="11.868132"
+       y="2.7252748"
+       transform="translate(0,988.36217)" />
+    <rect
+       y="991.08746"
+       x="51.868134"
+       height="25.758242"
+       width="1.6703297"
+       id="rect4325"
+       style="color:#000000;fill:#1e444d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+  </g>
+</svg>
