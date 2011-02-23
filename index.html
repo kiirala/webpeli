@@ -7,8 +7,22 @@
     <link rel="stylesheet" href="style.css" type="text/css" />
   </head>
   <body>
-    <canvas id="canvas" width="1" height="1">
-      <p>Your browser does not support the canvas element.</p>
-    </canvas>
+    <div class="game">
+      <div class="left">
+	<p>BlahBlah</p>
+      </div>
+      <canvas id="canvas" width="1" height="1">
+	<p>Your browser does not support the canvas element.</p>
+      </canvas>
+      <div class="right">
+	<p>Score:</p>
+	<p class="counter" id="score">0</p>
+	<p>Time alive:</p>
+	<p class="counter" id="timeAlive">0</p>
+	<p>Graze:</p>
+	<p class="counter" id="graze">0</p>
+	<button type="button" id="restart" onclick="initGame()">Restart game</button>
+      </div>
+    </div>
   </body>
 </html>

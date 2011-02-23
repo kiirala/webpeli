@@ -3,7 +3,7 @@ const FPS = 30;
 var x = 0;
 var y = 0;
 var time = 0;
-var aspectRatio = 3/4;
+var aspectRatio = 1;
 var scale = 1;
 var nominalWidth = 512;
 var nominalHeight = nominalWidth / aspectRatio;
@@ -40,6 +40,7 @@ function Bullet(image, x, y, speedx, speedy, accelx, accely) {
     this.accelx = accelx;
     this.accely = accely;
     this.image = image;
+    this.grazed = false;
 }
 Bullet.prototype = new Sprite();
 Bullet.prototype.move = function(time) {
@@ -87,32 +88,52 @@ function resizeWindow() {
     scale = canvas.width / nominalWidth;
 }
 
-$(function() {
-    canvas = document.getElementById('canvas');
-    context2D = canvas.getContext('2d');
-    setInterval(draw, 1000 / FPS);
-    resizeWindow();
-    var plimg = new Image();
-    plimg.src = "character.png"
-    $(plimg).ready(function() {
-	player = new Sprite(plimg);
-	player.x = nominalWidth / 2;
-	player.y = player.image.height / 2;
-	document.onkeydown = keydown;
-	document.onkeyup = keyup;
-    });
-    redbullet = new Image();
-    redbullet.src = "redbullet.png";
+function initGame() {
+    bullets = [];
+    player = new Sprite(plimg);
+    player.x = nominalWidth / 2;
+    player.y = player.image.height / 2;
+    x = 0;
+    y = 0;
     var now = new Date();
     startTime = now.getTime() / 1000;
     startAlpha = 0;
     alive = true;
+    graze = 0;
+    timeAlive = 0;
+}
+
+var imagesLoaded = 0;
+var imagesToLoad;
+function loadingDone() {
+    imagesLoaded += 1;
+    if (imagesLoaded == imagesToLoad) {
+	setInterval(draw, 1000 / FPS);
+	document.onkeydown = keydown;
+	document.onkeyup = keyup;
+	initGame();
+    }
+}
+
+$(function() {
+    canvas = document.getElementById('canvas');
+    context2D = canvas.getContext('2d');
+    resizeWindow();
+    imagesToLoad = 2;
+    plimg = new Image();
+    plimg.src = "character.png"
+    $(plimg).load(loadingDone);
+    redbullet = new Image();
+    redbullet.src = "redbullet.png";
+    $(redbullet).load(loadingDone);
 });
     
 $(window).resize(
 function() {
     resizeWindow();
 });
+
+$("#restart").click(initGame);
 
 var keys = [];
 keys.down = false;
@@ -166,6 +187,7 @@ function draw() {
     timePrev = time;
     time = now.getTime() / 1000 - startTime;
     var timeStep = time - timePrev;
+    if (alive) timeAlive = time;
 
     var playerSpeed = 60;
     var canvasSpeed = 30;
@@ -193,17 +215,20 @@ function draw() {
 	if (!bullets[i].isDead()) {
 	    aliveBullets.push(bullets[i]);
 	}
-	if ((bullets[i].x - player.x) * (bullets[i].x - player.x) +
-	    (bullets[i].y - player.y) * (bullets[i].y - player.y)
-	    < (14 + 10) * (14 + 10))
-	{
+	var dist = (bullets[i].x - player.x) * (bullets[i].x - player.x) +
+	    (bullets[i].y - player.y) * (bullets[i].y - player.y);
+	if (dist < (14 + 10) * (14 + 10)) {
 	    alive = false;
+	}
+	else if (alive && dist < (14 + 32) * (14 + 32) && !bullets[i].grazed) {
+	    graze++;
+	    bullets[i].grazed = true;
 	}
     }
     bullets = aliveBullets;
 
     startAlpha += Math.random() / 10;
-    if (alive && Math.random() > 0.9) {
+    if (alive && Math.random() > 0.95) {
 	var alpha;
 	for (alpha = startAlpha ; alpha < 2 * Math.PI + startAlpha ; alpha += Math.PI / 8) {
 	    bullets.push(new Bullet(redbullet,
@@ -245,5 +270,8 @@ function draw() {
 			    (nominalHeight - (b.minY() - y) - b.image.height) * scale,
 			    b.image.width * scale, b.image.height * scale);
     }
-    context2D.fillText(time.toFixed(2) + " " + count, 0, 10);
+    //context2D.fillText(time.toFixed(2) + " " + count + " " + graze, 0, 10);
+    $("#score").html((timeAlive * 1000 + graze * 10000).toFixed(0));
+    $("#timeAlive").html(timeAlive.toFixed(1) + ' s');
+    $("#graze").html(graze);
 }
