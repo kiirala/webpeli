@@ -17,114 +17,6 @@ var context2D = null;
 var player = null;
 var bullets = [];
 
-function Sprite(image) {
-    this.x = 0;
-    this.y = 0;
-    this.image = image;
-}
-Sprite.prototype.minX = function() {
-    return this.x - this.image.width / 2;
-};
-Sprite.prototype.minY = function() {
-    return this.y - this.image.height / 2;
-};
-Sprite.prototype.maxX = function() {
-    return this.x + this.image.width / 2;
-};
-Sprite.prototype.maxY = function() {
-    return this.y + this.image.height / 2;
-};
-
-function Bullet(image, x, y, speedx, speedy, accelx, accely) {
-    this.x = x;
-    this.y = y;
-    this.speedx = speedx;
-    this.speedy = speedy;
-    this.accelx = accelx;
-    this.accely = accely;
-    this.image = image;
-    this.grazed = false;
-}
-Bullet.prototype = new Sprite();
-Bullet.prototype.move = function(time) {
-    this.speedx += this.accelx * time;
-    this.speedy += this.accely * time;
-    this.x += this.speedx * time;
-    this.y += this.speedy * time;
-}
-Bullet.prototype.isDead = function() {
-    if (this.maxX() < x || this.minX() >= x + nominalWidth ||
-	this.maxY() < y || this.minY() >= y + nominalHeight)
-	return true;
-    else
-	return false;
-}
-
-function TestEnemy(image, x, y) {
-    this.image = image;
-    this.x = x;
-    this.y = y;
-    this.time = 0;
-    this.seqPos = 0;	
-}
-TestEnemy.prototype = new Sprite();
-TestEnemy.prototype.sequence = [
-    [1.0, shootCircle, 16, 0],
-    [0.4, shootCircle, 16, 0],
-    [0.4, shootCircle, 16, 0],
-
-    [1.0, shootCircle, 16, 0],
-    [0.4, shootCircle, 16, 0.1],
-    [0.4, shootCircle, 16, 0.2],
-    [0.4, shootCircle, 16, 0.3],
-    [0.4, shootCircle, 16, 0.4],
-
-    [0.4, shootCircle, 16, 0.5],
-    [0.4, shootCircle, 16, 0.4],
-    [0.4, shootCircle, 16, 0.3],
-    [0.4, shootCircle, 16, 0.2],
-    [0.4, shootCircle, 16, 0.1],
-
-];
-
-TestEnemy.prototype.update = function(time) {
-    this.time += time;
-    if (this.time >= this.sequence[this.seqPos][0]) {
-	this.sequence[this.seqPos][1](this.x, this.y, this.sequence[this.seqPos][2], this.sequence[this.seqPos][3]);
-	this.time -= this.sequence[this.seqPos][0];
-	this.seqPos++;
-	if (this.seqPos >= this.sequence.length) {
-	    this.seqPos = 0;
-	}
-    }
-}
-
-function addBullet(bullet) {
-    if (bullets.used == bullets.length) {
-	bullets.push(bullet);
-    }
-    else {
-	bullets[bullets.used] = bullet;
-    }
-    bullets.used++;
-}
-function delBullet(index) {
-    bullets.used--;
-    bullets[index] = bullets[bullets.used];
-}
-
-function shootCircle(x, y, count, start) {
-    for (var alpha = start ;
-	 alpha < 2 * Math.PI + start ;
-	 alpha += Math.PI / (count / 2)) {
-	addBullet(new Bullet(redbullet,
-			     x, y,
-			     Math.cos(alpha) * bulletSpeed,
-			     Math.sin(alpha) * bulletSpeed,
-			     Math.cos(alpha) * bulletSpeed * 0.1,
-			     Math.sin(alpha) * bulletSpeed * 0.1));
-    }
-}
 
 function getWindowSize() {
     var myWidth = 0, myHeight = 0;
@@ -163,18 +55,21 @@ function initGame() {
     startTime = now.getTime() / 1000;
     time = 0;
     timeAlive = 0;
-    bullets = [];
+    bullets = dynamicArray();
     bullets.used = 0;
-    player = new Sprite(plimg);
+    player = new Player(plimg, nominalWidth / 2, plimg.height / 2);
+    /*
+    player = new Player(plimg);
     player.x = nominalWidth / 2;
-    player.y = player.image.height / 2;
+    player.y = plimg.height / 2;
+    */
     x = 0;
     y = 0;
     startAlpha = 0;
     alive = true;
     graze = 0;
-    enemies = [];
-    enemies.push(new TestEnemy(badguy, nominalWidth / 2, y + nominalHeight / 4 * 3));
+    enemies = dynamicArray();
+    enemies.lastTime = 0;
 }
 
 var imagesLoaded = 0;
@@ -183,10 +78,25 @@ function loadingDone() {
     imagesLoaded += 1;
     if (imagesLoaded == imagesToLoad) {
 	setInterval(draw, 1000 / FPS);
-	document.onkeydown = keydown;
-	document.onkeyup = keyup;
+	if(window.event) {
+	    // IE
+	    document.onkeydown = keydown_ie;
+	    document.onkeyup = keyup_ie;
+	}
+	else {
+	    // Netscape/Firefox/Opera
+	    document.onkeydown = keydown;
+	    document.onkeyup = keyup;
+	}
 	initGame();
     }
+}
+
+function loadImage(name) {
+    var img = new Image();
+    img.src = name;
+    $(img).load(loadingDone);
+    return img;
 }
 
 $(function() {
@@ -195,16 +105,12 @@ $(function() {
 
     resizeWindow();
 
-    imagesToLoad = 3;
-    plimg = new Image();
-    plimg.src = "character.png"
-    $(plimg).load(loadingDone);
-    redbullet = new Image();
-    redbullet.src = "redbullet.png";
-    $(redbullet).load(loadingDone);
-    badguy = new Image();
-    badguy.src = "badguy.png";
-    $(badguy).load(loadingDone);
+    imagesToLoad = 4;
+    plimg = loadImage("character.png");
+    redbullet = loadImage("redbullet.png");
+    yellowbullet = loadImage("yellowbullet.png");
+    badguy = loadImage("badguy.png");
+
     $("#restart").click(initGame);
 });
     
@@ -215,6 +121,7 @@ keys.down = false;
 keys.up = false;
 keys.left = false;
 keys.right = false;
+keys.shoot = false;
 function keyCodeToName(code) {
     switch(code) {
     case 37: 
@@ -225,37 +132,122 @@ function keyCodeToName(code) {
 	return 'right';
     case 40:
 	return 'down';
+    case 90: // z
+	return 'shoot'
+    default:
+	$("#debug").html(code);
     }
     return 'unknown';
 }
 
-//$(document).keydown(
 function keydown(event) {
-    var keynum = 0;
-    if(window.event) {
-	keynum = event.keyCode; // IE
-    }
-    else if(event.which) {
-	keynum = event.which; // Netscape/Firefox/Opera
-    }
+    var keynum = event.which;
     var name = keyCodeToName(keynum);
     keys[name] = true;
 }
-//);
+function keydown_ie(event) {
+    var keynum = event.keyCode;
+    var name = keyCodeToName(keynum);
+    keys[name] = true;
+}
 
-//$(document).keyup(
 function keyup(event) {
-    var keynum = 0;
-    if(window.event) {
-	keynum = event.keyCode; // IE
-    }
-    else if(event.which) {
-	keynum = event.which; // Netscape/Firefox/Opera
-    } 
+    var keynum = event.which;
     var name = keyCodeToName(keynum);
     keys[name] = false;
 }
-//);
+function keyup_ie(event) {
+    var keynum = event.keyCode;
+    var name = keyCodeToName(keynum);
+    keys[name] = false;
+}
+
+function updateBullets(timeStep) {
+    var i = 0;
+    while (i < bullets.used) {
+	bullets[i].move(timeStep);
+	if (alive) bullets[i].y += timeStep * canvasSpeed;
+	if (bullets[i].isDead()) {
+	    delBullet(bullets, i);
+	    continue;
+	}
+	var dist = (bullets[i].x - player.x) * (bullets[i].x - player.x) +
+	    (bullets[i].y - player.y) * (bullets[i].y - player.y);
+	if (dist < (14 + 10) * (14 + 10)) {
+	    alive = false;
+	    delBullet(bullets, i);
+	    continue;
+	}
+	else if (alive && dist < (14 + 32) * (14 + 32) && !bullets[i].grazed) {
+	    graze++;
+	    bullets[i].grazed = true;
+	}
+	i++;
+    }
+}
+
+function updatePlayerBullets(timeStep) {
+    var i = 0;
+    while (i < player.bullets.used) {
+	var bullet = player.bullets[i];
+	bullet.move(timeStep);
+	if (alive) bullet.y += timeStep * canvasSpeed;
+	if (bullet.isDead()) {
+	    delBullet(player.bullets, i);
+	    continue;
+	}
+	var e = 0;
+	var hit = false;
+	while (e < enemies.used) {
+	    var enemy = enemies[e];
+	    var dist = (bullet.x - enemy.x) * (bullet.x - enemy.x) +
+		(bullet.y - enemy.y) * (bullet.y - enemy.y);
+	    if (dist < (14 + 10) * (14 + 10)) {
+		arrayDel(enemies, e);
+		delBullet(player.bullets, i);
+		hit = true;
+		break;
+	    }
+	    e++;
+	}
+	if (!hit)
+	    i++;
+    }
+}
+
+function updatePlayer(timeStep, time) {
+    if (keys.right && player.maxX() < x + nominalWidth)
+	player.x += timeStep * playerSpeed;
+    if (keys.left && player.minX() > x)
+	player.x -= timeStep * playerSpeed;
+    if (keys.up && player.maxY() < y + nominalHeight)
+	player.y += timeStep * playerSpeed;
+    if (keys.down && player.minY() > y)
+	player.y -= timeStep * playerSpeed;
+    player.y += timeStep * canvasSpeed;
+    if (keys.shoot && time - player.lastShot > 0.5) {
+	addBullet(player.bullets, new Bullet(yellowbullet,
+					     player.x, player.y,
+					     0, 2 * bulletSpeed, 0, 0));
+	player.lastShot = time;
+    }
+}
+
+function updateEnemies(timeStep, time) {
+    if (time - enemies.lastTime > 5 ||
+	(enemies.used == 0 && time - enemies.lastTime > 2)) {
+	var emptyArea = 32;
+	var pos = Math.random() * (nominalWidth - 2 * emptyArea) + emptyArea;
+	arrayAdd(enemies, new TestEnemy(badguy,
+					pos, y + nominalHeight / 4 * 3));
+	enemies.lastTime = time;
+    }
+    for (var i = 0 ; i < enemies.used ; ++i)
+	enemies[i].y += timeStep * canvasSpeed;
+    for (var i = 0 ; i < enemies.used ; i++) {
+	enemies[i].update(timeStep);
+    }
+}
 
 function draw() {
     var now = new Date();
@@ -266,44 +258,12 @@ function draw() {
     if (!alive) return;
 
     timeAlive = time;
-    if (keys.right && player.maxX() < x + nominalWidth)
-	player.x += timeStep * playerSpeed;
-    if (keys.left && player.minX() > x)
-	player.x -= timeStep * playerSpeed;
-    if (keys.up && player.maxY() < y + nominalHeight)
-	player.y += timeStep * playerSpeed;
-    if (keys.down && player.minY() > y)
-	player.y -= timeStep * playerSpeed;
-    
+    updatePlayer(timeStep, time);
+    updateEnemies(timeStep, time);
+    updateBullets(timeStep);
+    updatePlayerBullets(timeStep);
+
     y += timeStep * canvasSpeed;
-    player.y += timeStep * canvasSpeed;
-    for (var i = 0 ; i < enemies.length ; ++i)
-	enemies[i].y += timeStep * canvasSpeed;
-    for (var i = 0 ; i < enemies.length ; i++) {
-	enemies[i].update(timeStep);
-    }
-    
-    var i = 0;
-    while (i < bullets.used) {
-	bullets[i].move(timeStep);
-	if (alive) bullets[i].y += timeStep * canvasSpeed;
-	if (bullets[i].isDead()) {
-	    delBullet(i);
-	    i--;
-	}
-	var dist = (bullets[i].x - player.x) * (bullets[i].x - player.x) +
-	    (bullets[i].y - player.y) * (bullets[i].y - player.y);
-	if (dist < (14 + 10) * (14 + 10)) {
-	    alive = false;
-	    delBullet(i);
-	    i--;
-	}
-	else if (alive && dist < (14 + 32) * (14 + 32) && !bullets[i].grazed) {
-	    graze++;
-	    bullets[i].grazed = true;
-	}
-	i++;
-    }
 
     context2D.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -330,7 +290,7 @@ function draw() {
 			player.image.height * scale);
 
 
-    for (var i = 0 ; i < enemies.length ; ++i) {
+    for (var i = 0 ; i < enemies.used ; ++i) {
 	var e = enemies[i];
 	context2D.drawImage(e.image,
 			    (e.minX() - x) * scale,
@@ -338,8 +298,16 @@ function draw() {
 			    e.image.width * scale, e.image.height * scale);
     }
 
-    for (var i = 0 ; i < bullets.length ; ++i) {
+    for (var i = 0 ; i < bullets.used ; ++i) {
 	var b = bullets[i];
+	context2D.drawImage(b.image,
+			    (b.minX() - x) * scale,
+			    (nominalHeight - (b.minY() - y) - b.image.height) * scale,
+			    b.image.width * scale, b.image.height * scale);
+    }
+
+    for (var i = 0 ; i < player.bullets.used ; ++i) {
+	var b = player.bullets[i];
 	context2D.drawImage(b.image,
 			    (b.minX() - x) * scale,
 			    (nominalHeight - (b.minY() - y) - b.image.height) * scale,
